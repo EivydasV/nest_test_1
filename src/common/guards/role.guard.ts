@@ -1,3 +1,4 @@
+import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import {
   CanActivate,
   ExecutionContext,
@@ -5,9 +6,7 @@ import {
   Session,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Request } from 'express';
-import { Observable } from 'rxjs';
-import { verifySession } from 'supertokens-node/recipe/session/framework/express';
+import Sess from 'supertokens-node/recipe/session';
 
 @Injectable()
 export class RoleGuard implements CanActivate {
@@ -22,8 +21,8 @@ export class RoleGuard implements CanActivate {
     // const session = await verifySession()(request, response, (res) => {
     //   console.log(res);
     // });
-    // console.log({ roles: request });
-    Session;
+    Sess.getSessionInformation();
+    console.log({ roles: request });
 
     if (!roles || roles.length === 0) {
       return true;
