@@ -49,6 +49,9 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Roles('admin')
   async me(@Session() session: SessionContainer) {
-    return session.getAccessTokenPayload();
+    const tokenPayload = session.getAccessTokenPayload();
+    const userID = session.getUserId();
+
+    return { tokenPayload, userID };
   }
 }
