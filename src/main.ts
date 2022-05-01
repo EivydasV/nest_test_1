@@ -11,6 +11,7 @@ import { AppModule } from './app.module';
 import helmet from 'helmet';
 import supertokens from 'supertokens-node';
 import { SupertokensExceptionFilter } from './auth/auth.filter';
+import { useContainer } from 'class-validator';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -26,28 +27,30 @@ async function bootstrap() {
   });
 
   app.useGlobalFilters(new SupertokensExceptionFilter());
-
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
+
       errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-      stopAtFirstError: true,
       forbidUnknownValues: true,
-      exceptionFactory: (validationErrors: ValidationError[] = []) => {
-        const errors = validationErrors.reduce(
-          (acc, curr) => ({
-            [curr.property]: curr.constraints[Object.keys(curr.constraints)[0]],
-          }),
-          {},
-        );
-        throw new HttpException(
-          {
-            status: HttpStatus.UNPROCESSABLE_ENTITY,
-            validationErrors: errors,
-          },
-          HttpStatus.UNPROCESSABLE_ENTITY,
-        );
-      },
+      // exceptionFactory: (validationErrors: ValidationError[] = []) => {
+      //   console.log(validationErrors);
+
+      //   const errors = validationErrors.reduce(
+      //     (acc, curr) => ({
+      //       [curr.property]: curr.constraints[Object.keys(curr.constraints)[0]],
+      //     }),
+      //     {},
+      //   );
+      //   throw new HttpException(
+      //     {
+      //       status: HttpStatus.UNPROCESSABLE_ENTITY,
+      //       validationErrors: errors,
+      //     },
+      //     HttpStatus.UNPROCESSABLE_ENTITY,
+      //   );
+      // },
     }),
   );
 

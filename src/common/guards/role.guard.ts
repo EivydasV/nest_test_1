@@ -6,15 +6,20 @@ import Sess from 'supertokens-node/recipe/session';
 export class RoleGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const roles = this.reflector.getAllAndOverride('roles', [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (!roles || roles.length === 0) return true;
+
     const ctx = context.switchToHttp();
     const resp = ctx.getResponse();
 
-    const sess = await Sess.getSession(ctx.getRequest(), resp, {
-      sessionRequired: true,
-    });
-    sess.getAccessTokenPayload();
+    const sess = await Sess.getSession(ctx.getRequest(), resp);
 
-    console.log({ sess: sess.getUserId() });
-    return true;
+    if (sess.getAccessTokenPayload().roles.some((r) => roles.includes(r)))
+      return true;
+
+    return false;
   }
 }
