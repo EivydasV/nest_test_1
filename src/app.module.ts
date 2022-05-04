@@ -10,6 +10,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { RoleGuard } from './common/guards/role.guard';
 import { LoggingMiddleware } from './common/middlewares/logging.middleware';
 import appConfig from './config/app.config';
+import { EntityExists } from './common/validators/is-unique.validator';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import appConfig from './config/app.config';
   ],
   controllers: [AppController],
   providers: [
+    EntityExists,
     AppService,
     { provide: APP_GUARD, useClass: AuthGuard },
     { provide: APP_GUARD, useClass: RoleGuard },

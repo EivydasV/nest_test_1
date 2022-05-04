@@ -8,21 +8,19 @@ import {
   Post,
   Res,
   Session,
-  UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
 import {
   createNewSession,
   SessionContainer,
 } from 'supertokens-node/recipe/session';
-import { AuthGuard } from '../common/guards/auth.guard';
 import { AuthService } from './auth.service';
-import { RoleGuard } from 'src/common/guards/role.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { LoginUserDto } from './dto/login-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Role } from './entities/user.entity';
 import { Public } from 'src/common/decorators/public.decorator';
+import * as argon from 'argon2';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -46,7 +44,10 @@ export class AuthController {
   ): Promise<{ message: string } | never> {
     const user = await this.authService.login(LoginUserDto);
 
-    if (!user || !(await user.comparePassword(LoginUserDto.password))) {
+    if (
+      !user ||
+      !(await this.comparePassword(user.password, LoginUserDto.password))
+    ) {
       throw new BadRequestException('Invalid credentials');
     }
 
@@ -76,5 +77,9 @@ export class AuthController {
     const userID = session.getUserId();
 
     return { tokenPayload, userID };
+  }
+
+  async comparePassword(currentPassword: string, candidatePassword: string) {
+    return argon.verify(currentPassword, candidatePassword);
   }
 }

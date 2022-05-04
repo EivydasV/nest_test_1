@@ -10,27 +10,30 @@ import {
   Validate,
 } from 'class-validator';
 import { IsEqualTo } from 'src/common/validators/is-equal-to.valdiator';
+import { EntityExists } from 'src/common/validators/is-unique.validator';
 import { IsStrongPassword } from 'src/common/validators/strong-password.valdiator';
+import { User } from '../entities/user.entity';
 
 export class CreateUserDto {
   @Length(2, 50)
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   name: string;
 
+  @Validate(EntityExists, [User])
   @Length(2, 50)
-  @IsNotEmpty()
-  @IsString()
   @IsEmail()
+  @IsString()
+  @IsNotEmpty()
   email: string;
 
+  @IsStrongPassword()
   @IsNotEmpty()
   @IsString()
-  @IsStrongPassword()
   password: string;
 
-  @IsNotEmpty()
   @IsString()
   @IsEqualTo('password')
+  @IsNotEmpty()
   password_confirmation: string;
 }

@@ -31,7 +31,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
-
+      stopAtFirstError: true,
       errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
       forbidUnknownValues: true,
       // exceptionFactory: (validationErrors: ValidationError[] = []) => {

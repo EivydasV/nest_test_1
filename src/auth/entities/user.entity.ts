@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import validator from 'validator';
-import * as argon from 'argon2';
 
 export enum Role {
   USER = 'user',
@@ -25,21 +24,11 @@ export class User extends Document {
   })
   email: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, select: false })
   password: string;
 
   @Prop({ required: true, default: Role.USER })
   roles: Role[];
-
-  comparePassword: (candidatePassword: string) => Promise<boolean>;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-
-UserSchema.methods.comparePassword = async function (
-  candidatePassword: string,
-) {
-  const user = this as User;
-
-  return argon.verify(user.password, candidatePassword);
-};
